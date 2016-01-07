@@ -68,13 +68,13 @@
   (graphics-draw-line output -1 -.55 1 .55)
   (graphics-draw-line output -.55 1 .55 -1)
   (graphics-draw-line output .55 1 -.55 -1)
-  (map (lambda (u)
+  (map (lambda (r)
          (map (lambda (p)
                 (graphics-draw-point output
                                      (car p) (cdr p)))
               (map (lambda (t)
-                     (cons (* u (sin t))
-                           (* u (cos t))))
+                     (cons (* r (sin t))
+                           (* r (cos t))))
                    (range -6 6 .005))))
        (range 0 1.5 .1)))
 
@@ -112,6 +112,16 @@
   (map (lambda (lst)
   	     (graphics-draw-point device (car lst) (cadr lst)))
        (zip range (map func range))))
+
+(define (plot-polar output color func range)
+  (let ((cords (map func range)))
+    (draw-line output color 
+      (make-line-cords 
+        (map
+          (lambda (P)
+            (list (X (car P) (cadr P))
+                  (Y (car P) (cadr P))))
+          cords)))))                      
 
 (define (clear device color)
     (graphics-operation device 'set-foreground-color color)
@@ -239,6 +249,12 @@
 
 (define (map-r func str stp inc)
  (map func (range stp inc)))
+
+(define (X r theta)
+  (* r (cos theta)))
+
+(define (Y r theta)
+  (* r (sin theta)))
 
 
 
