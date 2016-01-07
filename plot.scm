@@ -10,6 +10,10 @@
   (cond ((> len 0) (cons fil (const-l fil (- len 1))))
         (else '())))
 
+(define (label output color string x y)
+  (graphics-operation output 'set-foreground-color color)
+  (graphics-draw-text output x y string))
+
 (define (draw-vector device color cords)
 ;prints a vector at start cords of size vector components, the input
 ;'(0 0 .5 .5) will make a vector (.5 .5) on screen with the tail at (0 0)
@@ -18,8 +22,8 @@
   (graphics-set-line-style device 0)
   (graphics-draw-line device x0 y0 (+ x0 x1) (+ y0 y1))
   (graphics-operation device 'fill-polygon (vector (+ (+ x0 x1) off) (+ (+ y0 y1) off)
-						                                       (+ (+ x0 x1) off) (- (+ y0 y1) off)
-						                                       (- (+ x0 x1) off) (- (+ y0 y1) off)
+						   (+ (+ x0 x1) off) (- (+ y0 y1) off)
+						   (- (+ x0 x1) off) (- (+ y0 y1) off)
                                                    (- (+ x0 x1) off) (+ (+ y0 y1) off))))
 
 (define (draw-vector-list device color cords)
@@ -56,6 +60,24 @@
  (graphics-draw-line device -1 0 1 0)
  (graphics-draw-line device 0 -1 0 1))
 
+(define (coord-grid-polar output color)
+  (graphics-operation output 'set-foreground-color color)
+  (graphics-draw-line output 0 -1 0 1)
+  (graphics-draw-line output -1 0 1 0)
+  (graphics-draw-line output -1 .55 1 -.55)
+  (graphics-draw-line output -1 -.55 1 .55)
+  (graphics-draw-line output -.55 1 .55 -1)
+  (graphics-draw-line output .55 1 -.55 -1)
+  (map (lambda (u)
+         (map (lambda (p)
+                (graphics-draw-point output
+                                     (car p) (cdr p)))
+              (map (lambda (t)
+                     (cons (* u (sin t))
+                           (* u (cos t))))
+                   (range -6 6 .005))))
+       (range 0 1.5 .1)))
+
 (define (draw-line device color cords)
 ;draws a line of line-segments from the list cords
 ;cords is of the form '((x0 y0 x1 y1) (x1 y1 x2 y2) ... (xn-1 yn-1 xn yn)
@@ -80,7 +102,7 @@
 ;plots a functin with line segments
 ;use for functs that can tolerate lower fidelity or when it is infeasable
 ;to plot enough points for function to be visible
-  (draw-line device color (make-line-cords (zip rng (map fun)))))
+  (draw-line device color (make-line-cords (zip rng (map fun rng)))))
 
 (define (plot-funct2 device color func range)
 ;plots a function with dots
@@ -215,28 +237,8 @@
          (coord-grid-cart output grid-color)
          (vector-field-plot output line-color xrange yrange func)))))
 
-(define (loop device x)
- (cond ((> x 0)
-        (clear device "red")
-        (clear device "red")
-        (clear device "orange")
-        (clear device "orange")
-        (clear device "yellow")
-        (clear device "yellow")
-        (loop device (- x 1)))))
+(define (map-r func str stp inc)
+ (map func (range stp inc)))
 
-(define (start x)
- (let ((device (make-graphics-device 'win32)))
-   (loop device (- x 1))
-   (clear device "white")
-   (coord-grid-cart device "black")
-   (vector-field-plot device "red" (range -1 1 .2)
-                                   (range -1 1 .2)
-                                   (lambda (x y)
-                                     (cons (* y -.1) (* x .1))))
-   (plot-funct2 device "blue" (lambda (x) (* x x x)) (range -1 1 .001))
-   (graphics-operation device 'set-foreground-color "black")
-   (graphics-draw-text device -.5 .5 "Plotlib 2D")
-   (graphics-draw-text device .3 .7 "Plotlib 2D")))
 
-(start 1000)
+
