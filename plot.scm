@@ -219,7 +219,7 @@
           (draw-line output line-color (make-line-cords
                                          (scale-point-list (zip range
                                                                 (map func range))
-                                                           xscale yscale)))))
+                                                           xscale yscale)))) 
         ((eq? mode 'alt-simple-scale-plot)
          (let* ((bg-color (car args))
                  (grid-color (cadr args))
@@ -234,7 +234,6 @@
                             (scale-point-list (zip range
                                                    (map func range))
                                               xscale yscale))))
-
        ((eq? mode 'vector-field-plot)
        ;does not work yet
         (let* ((bg-color (car args))
